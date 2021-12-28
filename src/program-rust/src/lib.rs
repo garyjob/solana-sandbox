@@ -13,6 +13,7 @@ use solana_program::{
 pub struct GreetingAccount {
     /// number of greetings
     pub counter: u32,
+    pub shitter: u32,
 }
 
 // Declare and export the program's entrypoint
@@ -38,12 +39,18 @@ pub fn process_instruction(
         return Err(ProgramError::IncorrectProgramId);
     }
 
+    msg!("Line 41");
     // Increment and store the number of times the account has been greeted
     let mut greeting_account = GreetingAccount::try_from_slice(&account.data.borrow())?;
+
     greeting_account.counter += 1;
+    greeting_account.shitter += 10;
+    msg!("Line 47");
     greeting_account.serialize(&mut &mut account.data.borrow_mut()[..])?;
+    msg!("Line 49");
 
     msg!("Greeted {} time(s)!", greeting_account.counter);
+    msg!("Shitted {} time(s)!", greeting_account.shitter);
 
     Ok(())
 }

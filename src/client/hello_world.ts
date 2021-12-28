@@ -56,14 +56,17 @@ const PROGRAM_SO_PATH = path.join(PROGRAM_PATH, 'helloworld.so');
  */
 const PROGRAM_KEYPAIR_PATH = path.join(PROGRAM_PATH, 'helloworld-keypair.json');
 
+
 /**
  * The state of a greeting account managed by the hello world program
  */
 class GreetingAccount {
   counter = 0;
-  constructor(fields: {counter: number} | undefined = undefined) {
+  shitter = 1;
+  constructor(fields: {counter: number, shitter: number} | undefined = undefined) {
     if (fields) {
       this.counter = fields.counter;
+      this.shitter = fields.shitter;
     }
   }
 }
@@ -72,8 +75,27 @@ class GreetingAccount {
  * Borsh schema definition for greeting accounts
  */
 const GreetingSchema = new Map([
-  [GreetingAccount, {kind: 'struct', fields: [['counter', 'u32']]}],
+  [GreetingAccount, {
+    kind: 'struct', 
+    fields: [
+      ['counter', 'u32'], 
+      ['shitter', 'u32']
+    ]
+  }],
 ]);
+
+// export async function tryBor(): Promise<void> {
+//   const task = new GreetingAccount({
+//     counter: 1,
+//     shitter: 'something',
+//   });
+
+//   const buf = borsh.serialize(GreetingSchema, task);
+//   console.log(buf);
+
+//   const newValue = borsh.deserialize(GreetingSchema, GreetingAccount, buf);
+//   console.log(newValue);
+// }
 
 /**
  * The expected size of each greeting account.
@@ -161,7 +183,7 @@ export async function checkProgram(): Promise<void> {
   console.log(`Using program ${programId.toBase58()}`);
 
   // Derive the address (public key) of a greeting account from the program so that it's easy to find later.
-  const GREETING_SEED = 'hello';
+  const GREETING_SEED = 'hello2';
   greetedPubkey = await PublicKey.createWithSeed(
     payer.publicKey,
     GREETING_SEED,
@@ -205,6 +227,8 @@ export async function sayHello(): Promise<void> {
     programId,
     data: Buffer.alloc(0), // All instructions are hellos
   });
+  console.log(instruction)
+
   await sendAndConfirmTransaction(
     connection,
     new Transaction().add(instruction),
@@ -229,6 +253,13 @@ export async function reportGreetings(): Promise<void> {
     greetedPubkey.toBase58(),
     'has been greeted',
     greeting.counter,
+    'time(s)',
+  );
+
+  console.log(
+    greetedPubkey.toBase58(),
+    'has been shitted on ',
+    greeting.shitter,
     'time(s)',
   );
 }
