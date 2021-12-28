@@ -32,6 +32,7 @@ pub fn process_instruction(
 
     // Get the account to say hello to
     let account = next_account_info(accounts_iter)?;
+    let account2 = next_account_info(accounts_iter)?;
 
     // The account must be owned by the program in order to modify its data
     if account.owner != program_id {
@@ -39,18 +40,21 @@ pub fn process_instruction(
         return Err(ProgramError::IncorrectProgramId);
     }
 
-    msg!("Line 41");
+    // The account must be owned by the program in order to modify its data
+    if account2.owner != program_id {
+        msg!("Greeted account does not have the correct program id");
+        return Err(ProgramError::IncorrectProgramId);
+    }    
+
     // Increment and store the number of times the account has been greeted
     let mut greeting_account = GreetingAccount::try_from_slice(&account.data.borrow())?;
+    let mut shitting_account = GreetingAccount::try_from_slice(&account2.data.borrow())?;
 
     greeting_account.counter += 1;
-    greeting_account.shitter += 10;
-    msg!("Line 47");
     greeting_account.serialize(&mut &mut account.data.borrow_mut()[..])?;
-    msg!("Line 49");
 
-    msg!("Greeted {} time(s)!", greeting_account.counter);
-    msg!("Shitted {} time(s)!", greeting_account.shitter);
+    shitting_account.shitter += 1000;
+    shitting_account.serialize(&mut &mut account2.data.borrow_mut()[..])?;    
 
     Ok(())
 }

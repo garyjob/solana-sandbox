@@ -36,6 +36,7 @@ let programId: PublicKey;
  * The public key of the account we are saying hello to
  */
 let greetedPubkey: PublicKey;
+let shittedPubkey: PublicKey;
 
 /**
  * Path to program files
@@ -215,6 +216,42 @@ export async function checkProgram(): Promise<void> {
     );
     await sendAndConfirmTransaction(connection, transaction, [payer]);
   }
+
+
+
+
+  const SHITTING_SEED = 'hello4';
+  shittedPubkey = await PublicKey.createWithSeed(
+    payer.publicKey,
+    SHITTING_SEED,
+    programId,
+  );
+
+  // Check if the greeting account has already been created
+  const shittedAccount = await connection.getAccountInfo(shittedPubkey);
+  if (shittedAccount === null) {
+    console.log(
+      'Creating account',
+      shittedPubkey.toBase58(),
+      'to say hello to',
+    );
+    const lamports = await connection.getMinimumBalanceForRentExemption(
+      GREETING_SIZE,
+    );
+
+    const transaction = new Transaction().add(
+      SystemProgram.createAccountWithSeed({
+        fromPubkey: payer.publicKey,
+        basePubkey: payer.publicKey,
+        seed: SHITTING_SEED,
+        newAccountPubkey: shittedPubkey,
+        lamports,
+        space: GREETING_SIZE,
+        programId,
+      }),
+    );
+    await sendAndConfirmTransaction(connection, transaction, [payer]);
+  }
 }
 
 /**
@@ -223,7 +260,10 @@ export async function checkProgram(): Promise<void> {
 export async function sayHello(): Promise<void> {
   console.log('Saying hello to', greetedPubkey.toBase58());
   const instruction = new TransactionInstruction({
-    keys: [{pubkey: greetedPubkey, isSigner: false, isWritable: true}],
+    keys: [
+      {pubkey: greetedPubkey, isSigner: false, isWritable: true},
+      {pubkey: shittedPubkey, isSigner: false, isWritable: true}
+    ],
     programId,
     data: Buffer.alloc(0), // All instructions are hellos
   });
@@ -256,10 +296,20 @@ export async function reportGreetings(): Promise<void> {
     'time(s)',
   );
 
+
+  const sAccountInfo = await connection.getAccountInfo(shittedPubkey);
+  if (sAccountInfo === null) {
+    throw 'Error: cannot find the greeted account';
+  }
+  const shitting = borsh.deserialize(
+    GreetingSchema,
+    GreetingAccount,
+    sAccountInfo.data,
+  );
   console.log(
-    greetedPubkey.toBase58(),
+    shittedPubkey.toBase58(),
     'has been shitted on ',
-    greeting.shitter,
+    shitting.shitter,
     'time(s)',
   );
 }
