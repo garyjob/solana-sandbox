@@ -3,12 +3,12 @@
  */
 
 import {
-  // tryBor,
   establishConnection,
   establishPayer,
   checkProgram,
   sayHello,
   reportGreetings,
+  transferTrueSightTokens,
 } from './hello_world';
 
 async function main() {
@@ -20,8 +20,6 @@ async function main() {
   // Determine who pays for the fees
   await establishPayer();
 
-  // await tryBor();
-
   // // Check if the program has been deployed
   await checkProgram();
 
@@ -30,6 +28,8 @@ async function main() {
 
   // Find out how many times that account has been greeted
   await reportGreetings();
+
+  // await transferTrueSightTokens();
 
   console.log('Success');
 }
