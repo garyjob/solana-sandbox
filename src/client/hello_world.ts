@@ -11,6 +11,10 @@ import {
   Transaction,
   sendAndConfirmTransaction,
 } from '@solana/web3.js';
+
+import * as web3 from "@solana/web3.js";
+import * as splToken from "@solana/spl-token";
+
 import fs from 'mz/fs';
 import path from 'path';
 import * as borsh from 'borsh';
@@ -217,9 +221,6 @@ export async function checkProgram(): Promise<void> {
     await sendAndConfirmTransaction(connection, transaction, [payer]);
   }
 
-
-
-
   const SHITTING_SEED = 'hello4';
   shittedPubkey = await PublicKey.createWithSeed(
     payer.publicKey,
@@ -296,6 +297,12 @@ export async function reportGreetings(): Promise<void> {
     'time(s)',
   );
 
+  console.log(
+    greetedPubkey.toBase58(),
+    'has been shitted',
+    greeting.shitter,
+    'time(s)',
+  );
 
   const sAccountInfo = await connection.getAccountInfo(shittedPubkey);
   if (sAccountInfo === null) {
@@ -306,6 +313,14 @@ export async function reportGreetings(): Promise<void> {
     GreetingAccount,
     sAccountInfo.data,
   );
+
+  console.log(
+    shittedPubkey.toBase58(),
+    'has been greeted',
+    shitting.counter,
+    'time(s)',
+  );
+    
   console.log(
     shittedPubkey.toBase58(),
     'has been shitted on ',
@@ -313,3 +328,51 @@ export async function reportGreetings(): Promise<void> {
     'time(s)',
   );
 }
+
+
+
+export async function transferTrueSightTokens(): Promise<void> {
+
+  // const fromTokenAccount = await mintToken.getOrCreateAssociatedAccountInfo(
+  //   wallet.publicKey
+  // );
+
+  // var myToken = new splToken.Token(
+  //   connection,
+  //   myMint,
+  //   splToken.TOKEN_PROGRAM_ID,
+  //   fromWallet
+  // );
+  // // Create associated token accounts for my token if they don't exist yet
+  // var fromTokenAccount = await myToken.getOrCreateAssociatedAccountInfo(
+  //   fromWallet.publicKey
+  // )
+  // var toTokenAccount = await myToken.getOrCreateAssociatedAccountInfo(
+  //   toWallet.publicKey
+  // )
+  // Add token transfer instructions to transaction
+  // const fromWalletPublicKey = "5iSkxWSbBM3nDYg8T85zCVXSD9baRoDRZuweqxDdYmUY";
+  // const fromAddress = "5iSkxWSbBM3nDYg8T85zCVXSD9baRoDRZuweqxDdYmUY";
+  // const toAddress = "48xsMyMx4nDfgxyB8AspumVaeART3cQWzFwYE82UZsFg";
+  
+  // var transaction = new web3.Transaction()
+  //   .add(
+  //     splToken.Token.createTransferInstruction(
+  //       splToken.TOKEN_PROGRAM_ID,
+  //       fromAddress,
+  //       toAddress,
+  //       fromWalletPublicKey,
+  //       [],
+  //       100
+  //     )
+  //   );
+  // // Sign transaction, broadcast, and confirm
+  // var signature = await web3.sendAndConfirmTransaction(
+  //   connection,
+  //   transaction,
+  //   [payer]
+  // );
+  // console.log("SIGNATURE", signature);
+  console.log("SUCCESS");  
+}
+
